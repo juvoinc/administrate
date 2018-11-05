@@ -1,7 +1,8 @@
 module Administrate
   class Namespace
-    def initialize(namespace)
+    def initialize(namespace, engine_namespace = nil)
       @namespace = namespace
+      @engine_namespace = engine_namespace
     end
 
     def resources
@@ -11,19 +12,35 @@ module Administrate
     end
 
     def routes
-      @routes ||= all_routes.select do |controller, _action|
-        controller.starts_with?("#{namespace}/")
-      end.map do |controller, action|
-        [controller.gsub(/^#{namespace}\//, ""), action]
+      if engine_namespace
+        search_string = "#{engine_namespace}/#{namespace}"
+        regex_search_string = /^#{engine_namespace}\/#{namespace}\//
+      else
+        search_string = "#{namespace}/"
+        regex_search_string = /^#{namespace}\//
       end
+
+      @routes ||=
+        all_routes.select do |controller, _action|
+          controller.starts_with?(search_string)
+        end.map do |controller, action|
+          [controller.gsub(regex_search_string, ""), action]
+        end
     end
 
     private
 
-    attr_reader :namespace
+    attr_reader :namespace, :engine_namespace
 
     def all_routes
-      Rails.application.routes.routes.map do |route|
+      app =
+        if engine_namespace
+          "#{engine_namespace.classify}::Engine".constantize.routes
+        else
+          Rails.application.routes
+        end
+
+      app.routes.map do |route|
         route.defaults.values_at(:controller, :action).map(&:to_s)
       end
     end

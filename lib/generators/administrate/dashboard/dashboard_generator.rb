@@ -25,19 +25,27 @@ module Administrate
       READ_ONLY_ATTRIBUTES = %w[id created_at updated_at]
 
       class_option :namespace, type: :string, default: "admin"
+      class_option :engine_namespace, type: :string, required: false
 
       source_root File.expand_path("../templates", __FILE__)
 
       def create_dashboard_definition
+        location =
+          if engine_namespace?
+            "app/dashboards/#{engine_namespace}/#{file_name}_dashboard.rb"
+          else
+            "app/dashboards/#{file_name}_dashboard.rb"
+          end
+
         template(
           "dashboard.rb.erb",
-          Rails.root.join("app/dashboards/#{file_name}_dashboard.rb"),
+          Rails.root.join(location),
         )
       end
 
       def create_resource_controller
         destination = Rails.root.join(
-          "app/controllers/#{namespace}/#{file_name.pluralize}_controller.rb",
+          "app/controllers/#{entire_namespace}/#{file_name.pluralize}_controller.rb",
         )
 
         template("controller.rb.erb", destination)
@@ -47,6 +55,18 @@ module Administrate
 
       def namespace
         options[:namespace]
+      end
+
+      def engine_namespace
+        options[:engine_namespace]
+      end
+
+      def entire_namespace
+        if engine_namespace
+          "#{engine_namespace}/#{namespace}"
+        else
+          namespace
+        end
       end
 
       def attributes
