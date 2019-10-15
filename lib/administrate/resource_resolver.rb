@@ -8,7 +8,13 @@ module Administrate
       ActiveSupport::Inflector.constantize("#{resource_class_name}Dashboard")
     end
 
+    def engine_namespace
+      Administrate.engine_namespace
+    end
+
     def namespace
+      controller_path.gsub!(/^#{engine_namespace}\//, "") if engine_namespace
+
       controller_path.split("/").first
     end
 
@@ -35,6 +41,8 @@ module Administrate
     end
 
     def controller_path_parts
+      controller_path.gsub!(/^#{engine_namespace}\//, "") if engine_namespace
+
       controller_path.split("/")[1..-1].map(&:singularize)
     end
 

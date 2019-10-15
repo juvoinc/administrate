@@ -7,9 +7,11 @@ module Administrate
       resources = Administrate::Search.new(scoped_resource,
                                            dashboard_class,
                                            search_term).run
+
       resources = apply_resource_includes(resources)
       resources = order.apply(resources)
       resources = resources.page(params[:page]).per(records_per_page)
+
       page = Administrate::Page::Collection.new(dashboard, order: order)
 
       render locals: {
@@ -46,7 +48,7 @@ module Administrate
 
       if resource.save
         redirect_to(
-          [namespace, resource],
+          [namespace, engine_namespace, resource],
           notice: translate_with_resource("create.success"),
         )
       else
@@ -59,7 +61,7 @@ module Administrate
     def update
       if requested_resource.update(resource_params)
         redirect_to(
-          [namespace, requested_resource],
+          [namespace, engine_namespace, requested_resource],
           notice: translate_with_resource("update.success"),
         )
       else
@@ -93,7 +95,7 @@ module Administrate
     end
 
     def routes
-      @routes ||= Namespace.new(namespace).routes
+      @routes ||= Namespace.new(namespace, engine_namespace).routes
     end
 
     def records_per_page
@@ -149,9 +151,10 @@ module Administrate
       end
     end
 
-    delegate :dashboard_class, :resource_class, :resource_name, :namespace,
+    delegate :dashboard_class, :resource_class, :resource_name, :namespace, :engine_namespace,
       to: :resource_resolver
     helper_method :namespace
+    helper_method :engine_namespace
     helper_method :resource_name
 
     def resource_resolver
