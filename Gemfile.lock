@@ -2,16 +2,16 @@ PATH
   remote: .
   specs:
     administrate (0.11.0)
-      actionpack (>= 4.2, < 6.0)
-      actionview (>= 4.2, < 6.0)
-      activerecord (>= 4.2, < 6.0)
+      actionpack (>= 4.2)
+      actionview (>= 4.2)
+      activerecord (>= 4.2)
       autoprefixer-rails (>= 6.0)
       datetime_picker_rails (~> 0.0.7)
       jquery-rails (>= 4.0)
       kaminari (>= 1.0)
       momentjs-rails (~> 2.8)
       sass-rails (~> 5.0)
-      selectize-rails (~> 0.6)
+      selectize-rails (>= 0.6)
 
 GEM
   remote: https://rubygems.org/
@@ -82,7 +82,7 @@ GEM
     dotenv (2.5.0)
     dotenv-rails (2.5.0)
       dotenv (= 2.5.0)
-      railties (>= 3.2, < 6.0)
+      railties (>= 3.2)
     erubi (1.7.1)
     execjs (2.7.0)
     factory_bot (4.8.2)
